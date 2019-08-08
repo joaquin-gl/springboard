@@ -27,6 +27,48 @@ drake_cc_library(
     ],
 )
 
+drake_cc_library(
+    name = "easy_shape",
+    srcs = [
+        "easy_shape.cc",
+    ],
+    hdrs = [
+        "easy_shape.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//multibody/plant",
+    ],
+)
+
+drake_cc_library(
+    name = "lsd_shape",
+    srcs = [
+        "lsd_shape.cc",
+    ],
+    hdrs = [
+        "lsd_shape.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//multibody/plant",
+    ],
+)
+
+drake_cc_library(
+    name = "convenience",
+    srcs = [
+        "convenience.cc",
+    ],
+    hdrs = [
+        "convenience.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//multibody/plant",
+    ],
+)
+
 drake_cc_binary(
     name = "easy_force_box_test",
     srcs = ["easy_force_box_test.cc"],
@@ -49,8 +91,8 @@ drake_cc_binary(
 )
 
 drake_cc_binary(
-    name = "change_viz_box_test",
-    srcs = ["change_viz_box_test.cc"],
+    name = "shape_collision",
+    srcs = ["shape_collision.cc"],
     add_test_rule = 1,
     test_rule_args = [
         "--simulation_time=0.1",
@@ -64,6 +106,10 @@ drake_cc_binary(
         "//multibody/plant",
         "//systems/analysis:simulator",
         "//systems/framework:diagram",
+        "//examples/springboard:easy_force",
+        "//examples/springboard:easy_shape",
+        "//examples/springboard:lsd_shape",
+        "//examples/springboard:convenience",
         "@gflags",
     ],
 )
