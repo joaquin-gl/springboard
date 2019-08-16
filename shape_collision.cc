@@ -73,35 +73,7 @@ int do_main() {
     // Add gravity to the model.
     plant.AddForceElement<UniformGravityFieldElement>();
 
-    // Add box to model
     srand(time(NULL));
-
-    // initial vector for dropping objects
-    math::RigidTransformd X_WO(Vector3d(0, 0, FLAGS_s*FLAGS_h));
-    if (FLAGS_rand_rot){
-        X_WO.set_rotation(math::RotationMatrixd(math::RollPitchYawd(
-            2.0*M_PI*double(rand()) / double(RAND_MAX),
-            2.0*M_PI*double(rand()) / double(RAND_MAX),
-            2.0*M_PI*double(rand()) / double(RAND_MAX))));
-        }
-
-    // vector of positions of vertices of lsdbox in lsdbox frame
-    std::vector<Vector3d> div_p_vector = {
-        Vector3d( 0.5*FLAGS_s, -0.5*FLAGS_s, -0.5*FLAGS_s),
-        Vector3d(-0.5*FLAGS_s, -0.5*FLAGS_s, -0.5*FLAGS_s),
-        Vector3d(-0.5*FLAGS_s,  0.5*FLAGS_s, -0.5*FLAGS_s),
-        Vector3d( 0.5*FLAGS_s,  0.5*FLAGS_s, -0.5*FLAGS_s),
-        Vector3d(-0.5*FLAGS_s, -0.5*FLAGS_s,  0.5*FLAGS_s),
-        Vector3d( 0.5*FLAGS_s, -0.5*FLAGS_s,  0.5*FLAGS_s),
-        Vector3d(-0.5*FLAGS_s,  0.5*FLAGS_s,  0.5*FLAGS_s),
-        Vector3d( 0.5*FLAGS_s,  0.5*FLAGS_s,  0.5*FLAGS_s),
-    };
-
-    // vector of lsdbox vertices in world frame
-    std::vector<math::RigidTransformd> X_WD_vector(div_p_vector.size());
-    for (unsigned int i=0; i<div_p_vector.size(); i++) {
-        X_WD_vector[i] = X_WO*math::RigidTransformd(div_p_vector[i]);
-    }
 
     // indices for object to set initial transform
     multibody::ModelInstanceIndex model_instance_index(0);
@@ -130,7 +102,7 @@ int do_main() {
 
     } else if (FLAGS_obj=="lsdbox") {
         model_instance_index = AddLSDBoxToPlant(
-            "lsdbox", FLAGS_s/20,
+            "lsdbox", FLAGS_s/10,
             FLAGS_s, FLAGS_s, FLAGS_s,
             FLAGS_m, FLAGS_k, FLAGS_b, &plant);
         // object_body_index(1);
@@ -181,6 +153,33 @@ int do_main() {
 
     systems::Simulator<double> simulator(*diagram, std::move(diagram_context));
     auto& simulator_context = simulator.get_mutable_context();
+
+    // initial vector for dropping objects
+    math::RigidTransformd X_WO(Vector3d(0, 0, FLAGS_s*FLAGS_h));
+    if (FLAGS_rand_rot){
+        X_WO.set_rotation(math::RotationMatrixd(math::RollPitchYawd(
+            2.0*M_PI*double(rand()) / double(RAND_MAX),
+            2.0*M_PI*double(rand()) / double(RAND_MAX),
+            2.0*M_PI*double(rand()) / double(RAND_MAX))));
+        }
+
+    // vector of positions of vertices of lsdbox in lsdbox frame
+    std::vector<Vector3d> div_p_vector = {
+        Vector3d( 0.5*FLAGS_s, -0.5*FLAGS_s, -0.5*FLAGS_s),
+        Vector3d(-0.5*FLAGS_s, -0.5*FLAGS_s, -0.5*FLAGS_s),
+        Vector3d(-0.5*FLAGS_s,  0.5*FLAGS_s, -0.5*FLAGS_s),
+        Vector3d( 0.5*FLAGS_s,  0.5*FLAGS_s, -0.5*FLAGS_s),
+        Vector3d(-0.5*FLAGS_s, -0.5*FLAGS_s,  0.5*FLAGS_s),
+        Vector3d( 0.5*FLAGS_s, -0.5*FLAGS_s,  0.5*FLAGS_s),
+        Vector3d(-0.5*FLAGS_s,  0.5*FLAGS_s,  0.5*FLAGS_s),
+        Vector3d( 0.5*FLAGS_s,  0.5*FLAGS_s,  0.5*FLAGS_s),
+    };
+
+    // vector of lsdbox vertices in world frame
+    std::vector<math::RigidTransformd> X_WD_vector(div_p_vector.size());
+    for (unsigned int i=0; i<div_p_vector.size(); i++) {
+        X_WD_vector[i] = X_WO*math::RigidTransformd(div_p_vector[i]);
+    }
 
     // Show that object initial poses are unset and must be set
     std::cout << "UNSET POSES:\n";

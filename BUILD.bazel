@@ -69,6 +69,18 @@ drake_cc_library(
     ],
 )
 
+drake_cc_library(
+    name = "csv_logger",
+    srcs = [
+        "csv_logger.cc",
+    ],
+    hdrs = [
+        "csv_logger.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = ["//common:find_resource"],
+)
+
 drake_cc_binary(
     name = "easy_force_box_test",
     srcs = ["easy_force_box_test.cc"],

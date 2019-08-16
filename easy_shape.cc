@@ -4,8 +4,8 @@ namespace drake {
 namespace examples {
 
 multibody::BodyIndex AddBoxToPlant(
-    std::string name, multibody::ModelInstanceIndex model_instance,
-    double width, double depth, double height, double mass,
+    const std::string name, const multibody::ModelInstanceIndex model_instance,
+    const double width, const double depth, const double height, const double mass,
     MultibodyPlant<double>* plant) {
 
     DRAKE_THROW_UNLESS(plant != nullptr);
@@ -23,7 +23,8 @@ multibody::BodyIndex AddBoxToPlant(
         body, math::RigidTransformd(),
         geometry::Box(width, depth, height),
         "box_visual",
-        Eigen::Vector4d(0.5, 0.5, 0.5, 0.5));
+        // Eigen::Vector4d(111./255, 44./255, 141./255, 0.5));
+        Eigen::Vector4d(187./255, 188./255, 188./255, 1));
 
     // Add friction model
     plant->RegisterCollisionGeometry(
@@ -36,8 +37,8 @@ multibody::BodyIndex AddBoxToPlant(
     }
 
 multibody::BodyIndex AddCylinderToPlant(
-    std::string name, multibody::ModelInstanceIndex model_instance,
-    double radius, double height, double mass,
+    const std::string name, const multibody::ModelInstanceIndex model_instance,
+    const double radius, const double height, const double mass,
     MultibodyPlant<double>* plant) {
 
     DRAKE_THROW_UNLESS(plant != nullptr);
@@ -55,7 +56,8 @@ multibody::BodyIndex AddCylinderToPlant(
         body, math::RigidTransformd(),
         geometry::Cylinder(radius, height),
         "cylinder_visual",
-        Eigen::Vector4d(0.5, 0.5, 0.5, 0.5));
+        // Eigen::Vector4d(27./255, 80./255, 144./255, 0.5));
+        Eigen::Vector4d(187./255, 188./255, 188./255, 1));
 
     plant->RegisterCollisionGeometry(
         body, math::RigidTransformd(),
@@ -67,8 +69,8 @@ multibody::BodyIndex AddCylinderToPlant(
     }
 
 multibody::BodyIndex AddSphereToPlant(
-    std::string name, multibody::ModelInstanceIndex model_instance,
-    double radius, double mass,
+    const std::string name, const multibody::ModelInstanceIndex model_instance,
+    const double radius, const double mass,
     MultibodyPlant<double>* plant) {
 
     DRAKE_THROW_UNLESS(plant != nullptr);
@@ -86,7 +88,8 @@ multibody::BodyIndex AddSphereToPlant(
         body, math::RigidTransformd(),
         geometry::Sphere(radius),
         "sphere_visual",
-        Eigen::Vector4d(0.5, 0.5, 0.5, 0.5));
+        // Eigen::Vector4d(246./255, 133./255, 31./255, 0.5));
+        Eigen::Vector4d(187./255, 188./255, 188./255, 1));
 
     plant->RegisterCollisionGeometry(
         body, math::RigidTransformd(),
@@ -98,8 +101,8 @@ multibody::BodyIndex AddSphereToPlant(
     }
 
 multibody::ModelInstanceIndex AddTableToPlant(
-    double width, double depth, double height,
-    math::RigidTransformd X_WT,
+    const double width, const double depth, const double height,
+    const math::RigidTransformd X_WT,
     MultibodyPlant<double>* plant) {
 
     DRAKE_THROW_UNLESS(plant != nullptr);
@@ -108,7 +111,7 @@ multibody::ModelInstanceIndex AddTableToPlant(
         plant->world_body(), X_WT,
         geometry::Box(width, depth, height),
         "table_visual",
-        Eigen::Vector4d(0.5, 0.5, 0.5, 1));
+        Eigen::Vector4d(187./255, 188./255, 188./255, 1));
 
     plant->RegisterCollisionGeometry(
         plant->world_body(), X_WT,

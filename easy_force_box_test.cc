@@ -30,7 +30,7 @@ DEFINE_double(target_realtime_rate, 1.0,
             "Desired rate relative to real time.  See documentation for "
             "Simulator::set_target_realtime_rate() for details.");
 
-DEFINE_double(duration, 10.0,
+DEFINE_double(duration, 15.0,
             "Desired duration of the simulation in seconds.");
 
 DEFINE_double(time_step, 0,
@@ -43,7 +43,11 @@ DEFINE_double(box_m, 1, "Mass of Box");
 
 DEFINE_bool(rand_rpy, true, "Randomize initial Box rotation");
 
-DEFINE_double(trigger, 1, "Trigger time");
+DEFINE_double(t0, 1, "Trigger time 0");
+DEFINE_double(t1, 3, "Trigger time 1");
+DEFINE_double(t2, 8, "Trigger time 2");
+DEFINE_double(t, 0.4, "Torque");
+DEFINE_double(f, 1, "Force");
 
 int do_main() {
     systems::DiagramBuilder<double> builder;
@@ -55,20 +59,9 @@ int do_main() {
     scene_graph.set_name("scene_graph");
 
     // Add gravity to the model.
-    plant.AddForceElement<UniformGravityFieldElement>();
+    // plant.AddForceElement<UniformGravityFieldElement>();
 
     // Add red box to model.
-    math::RigidTransform<double> X_WA; // Identity
-    if (FLAGS_rand_rpy) {
-        srand(time(NULL));
-
-        math::RollPitchYaw<double> R_WA(
-            2.0*M_PI*double(rand()) / double(RAND_MAX),
-            2.0*M_PI*double(rand()) / double(RAND_MAX),
-            2.0*M_PI*double(rand()) / double(RAND_MAX));
-
-        X_WA = math::RigidTransformd(R_WA, Vector3d::Zero());
-    }
 
     // Add spatial inertia
     drake::multibody::SpatialInertia<double> M_Acm(
@@ -80,44 +73,33 @@ int do_main() {
 
     // Visual Geometry
     plant.RegisterVisualGeometry(
-        red_box, X_WA,
+        red_box, math::RigidTransformd(),
         geometry::Box(FLAGS_box_l, FLAGS_box_l, FLAGS_box_l),
         "red_box_visual",
         Eigen::Vector4d(1, 0.5, 0.5, 1));
 
     // Collision Geometry
     plant.RegisterCollisionGeometry(
-        red_box, X_WA,
+        red_box, math::RigidTransformd(),
         geometry::Box(FLAGS_box_l, FLAGS_box_l, FLAGS_box_l),
         "red_box_collision",
         drake::multibody::CoulombFriction<double>(0.3, 0.3));
 
 
     // Add green box to model.
-    math::RigidTransform<double> X_WB; // Identity
-    if (FLAGS_rand_rpy) {
-        srand(time(NULL));
-
-        math::RollPitchYaw<double> R_WA(
-            2.0*M_PI*double(rand()) / double(RAND_MAX),
-            2.0*M_PI*double(rand()) / double(RAND_MAX),
-            2.0*M_PI*double(rand()) / double(RAND_MAX));
-
-        X_WB = math::RigidTransformd(R_WA, Vector3d(1, 1, 1));
-    }
 
     const drake::multibody::RigidBody<double>& green_box = plant.AddRigidBody("green_box", M_Acm);
 
     // Visual Geometry
     plant.RegisterVisualGeometry(
-        green_box, X_WB,
+        green_box, math::RigidTransformd(),
         geometry::Box(FLAGS_box_l, FLAGS_box_l, FLAGS_box_l),
         "green_box_visual",
         Eigen::Vector4d(0.5, 1, 0.5, 1));
 
     // Collision Geometry
     plant.RegisterCollisionGeometry(
-        green_box, X_WB,
+        green_box, math::RigidTransformd(),
         geometry::Box(FLAGS_box_l, FLAGS_box_l, FLAGS_box_l),
         "green_box_collision",
         drake::multibody::CoulombFriction<double>(0.3, 0.3));
@@ -152,6 +134,32 @@ int do_main() {
     systems::Simulator<double> simulator(*diagram, std::move(diagram_context));
     auto& simulator_context = simulator.get_mutable_context();
 
+    math::RigidTransform<double> X_WA; // Identity
+    math::RigidTransform<double> X_WB; // Identity
+
+    if (FLAGS_rand_rpy) {
+        srand(time(NULL));
+
+        math::RollPitchYaw<double> R_WA(
+            2.0*M_PI*double(rand()) / double(RAND_MAX),
+            2.0*M_PI*double(rand()) / double(RAND_MAX),
+            2.0*M_PI*double(rand()) / double(RAND_MAX));
+
+        X_WA = math::RigidTransformd(R_WA, Vector3d(-2, 0, 0));
+        srand(time(NULL));
+
+        srand(time(NULL));
+        math::RollPitchYaw<double> R_WB(
+            2.0*M_PI*double(rand()) / double(RAND_MAX),
+            2.0*M_PI*double(rand()) / double(RAND_MAX),
+            2.0*M_PI*double(rand()) / double(RAND_MAX));
+
+        X_WB = math::RigidTransformd(R_WB, Vector3d(2, 0, 0));
+    }
+
+    plant.SetFreeBodyPose(&plant_context, plant.GetBodyByName("red_box"), X_WA);
+    plant.SetFreeBodyPose(&plant_context, plant.GetBodyByName("green_box"), X_WB);
+
     simulator.set_publish_every_time_step(false);
     simulator.set_target_realtime_rate(FLAGS_target_realtime_rate);
     simulator.Initialize();
@@ -166,36 +174,34 @@ int do_main() {
         // Set BodyIndex to first box for target of force
         // Second box falls :,(
         // Set Force to balance gravity and small spin torque
-        if (current_time >= 0 && current_time < 0 + time_delta) {
+        if (current_time >= FLAGS_t0 && current_time < FLAGS_t0 + time_delta) {
             std::cout << "Sending First Force...\n";
             easy_force->SetBodyIndex(0, plant.GetBodyByName("red_box").index());
             easy_force->SetForce(0, drake::multibody::SpatialForce<double>(
-                Vector3d(0, 0, 0.1),        // torque
-                Vector3d(0, 0, 9.81)));     // force
+                Vector3d(0, 0, FLAGS_t),        // torque
+                Vector3d(0, 0, 0)));     // force
+            easy_force->AddForce(plant.GetBodyByName("green_box").index(),
+            drake::multibody::SpatialForce<double>(
+                Vector3d(0, 0, 0),
+                Vector3d(0, FLAGS_f, 0)));
         }
 
         // Set Force higher in z direction, reverse spin torque
-        double trigger(FLAGS_trigger);
-        if (current_time >= trigger && current_time < trigger + time_delta) {
+        if (current_time >= FLAGS_t1 && current_time < FLAGS_t1 + time_delta) {
             std::cout << "Increasing force...\n";
             easy_force->SetForce(0, drake::multibody::SpatialForce<double>(
-                Vector3d(0, 0, -0.1),
-                Vector3d(0, 0, 20)));
+                Vector3d(0, 0, -FLAGS_t),
+                Vector3d(0, 0, 0)));
+            easy_force->SetForce(1, drake::multibody::SpatialForce<double>(
+                Vector3d(0, 0, 0),
+                Vector3d(0, -FLAGS_f, 0)));
         }
 
         // Change BodyIndex to the second box, first box now falls
-        if (current_time >= trigger*2 && current_time < trigger*2 + time_delta) {
+        if (current_time >= FLAGS_t2 && current_time < FLAGS_t2 + time_delta) {
             std::cout << "Changing Body...\n";
             easy_force->SetBodyIndex(0, plant.GetBodyByName("green_box").index());
-        }
-
-        // Change BodyIndex to the second box, first box now falls
-        if (current_time >= trigger*5 && current_time < trigger*5 + time_delta) {
-            std::cout << "Adding New Force...\n";
-            easy_force->AddForce(plant.GetBodyByName("red_box").index(),
-                drake::multibody::SpatialForce<double>(
-                    Vector3d(0, 0, -0.1),
-                    Vector3d(0, 0, 20)));
+            easy_force->SetBodyIndex(1, plant.GetBodyByName("red_box").index());
         }
 
         simulator.StepTo(current_time + time_delta);

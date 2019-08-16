@@ -48,7 +48,7 @@ multibody::ModelInstanceIndex AddLSDBoxToPlant(
             plant->GetBodyByName(div_name), math::RigidTransformd(),
             geometry::Sphere(div_radius),
             div_name + "_visual",
-            Eigen::Vector4d(1, 0.5, 0.5, 0.5));
+            Eigen::Vector4d(66./255, 197./255, 226./255, 1));
 
         plant->RegisterCollisionGeometry(
             plant->GetBodyByName(div_name), math::RigidTransformd(),

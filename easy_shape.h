@@ -13,23 +13,23 @@ using drake::multibody::MultibodyPlant;
 using Eigen::Vector3d;
 
 multibody::BodyIndex AddBoxToPlant(
-    std::string name, multibody::ModelInstanceIndex model_instance,
-    double width, double depth, double height, double mass,
+    const std::string name, const multibody::ModelInstanceIndex model_instance,
+    const double width, const double depth, const double height, const double mass,
     MultibodyPlant<double>* plant);
 
 multibody::BodyIndex AddCylinderToPlant(
-    std::string name, multibody::ModelInstanceIndex model_instance,
-    double radius, double height, double mass,
+    const std::string name, const multibody::ModelInstanceIndex model_instance,
+    const double radius, const double height, const double mass,
     MultibodyPlant<double>* plant);
 
 multibody::BodyIndex AddSphereToPlant(
-    std::string name, multibody::ModelInstanceIndex model_instance,
-    double radius, double mass,
+    const std::string name, const multibody::ModelInstanceIndex model_instance,
+    const double radius, const double mass,
     MultibodyPlant<double>* plant);
 
 multibody::ModelInstanceIndex AddTableToPlant(
-    double width, double depth, double height,
-    math::RigidTransformd X_WT,
+    const double width, const double depth, const double height,
+    const math::RigidTransformd X_WT,
     MultibodyPlant<double>* plant);
 
 }  // namespace examples
