@@ -4,7 +4,6 @@
 
 #include "drake/common/drake_assert.h"
 #include "drake/common/find_resource.h"
-#include "drake/common/text_logging_gflags.h"
 #include "drake/geometry/geometry_visualization.h"
 #include "drake/geometry/scene_graph.h"
 #include "drake/lcm/drake_lcm.h"
@@ -71,7 +70,9 @@ int do_main() {
     scene_graph.set_name("scene_graph");
 
     // Add gravity to the model.
-    plant.AddForceElement<UniformGravityFieldElement>();
+    // plant.AddForceElement<UniformGravityFieldElement>();
+    const Vector3<double> gravity_vector_W(0, 0, -9.81);
+    plant.mutable_gravity_field().set_gravity_vector(gravity_vector_W);
 
     srand(time(NULL));
 
@@ -232,7 +233,7 @@ int do_main() {
                     Vector3d(0,0,FLAGS_m*-9.81)));
         }
 
-        simulator.StepTo(current_time + time_delta);
+        simulator.AdvanceTo(current_time + time_delta);
         current_time = simulator_context.get_time();
     }
 
@@ -249,6 +250,5 @@ int main(int argc, char* argv[]) {
       "to demonstrate EasyForce and making an LSD shape."
       "Launch drake-visualizer before running this example.");
   gflags::ParseCommandLineFlags(&argc, &argv, true);
-  drake::logging::HandleSpdlogGflags();
   return drake::examples::do_main();
 }

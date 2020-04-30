@@ -91,7 +91,7 @@ drake_cc_binary(
     ],
     deps = [
         "//common:find_resource",
-        "//common:text_logging_gflags",
+        "//common:add_text_logging_gflags",
         "//geometry:geometry_visualization",
         "//multibody/parsing",
         "//multibody/plant",
@@ -112,7 +112,7 @@ drake_cc_binary(
     ],
     deps = [
         "//common:find_resource",
-        "//common:text_logging_gflags",
+        "//common:add_text_logging_gflags",
         "//geometry:geometry_visualization",
         "//multibody/parsing",
         "//multibody/plant",

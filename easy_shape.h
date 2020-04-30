@@ -2,7 +2,6 @@
 
 #include <memory>
 
-#include "drake/common/drake_optional.h"
 #include "drake/common/find_resource.h"
 #include "drake/multibody/plant/multibody_plant.h"
 
